@@ -4,6 +4,9 @@ from utils import Config
 
 
 def init_logger(config: Config):
+    if not os.path.exists(config.LOG_DIR):
+        os.makedirs(config.LOG_DIR)
+
     log_path: str = os.path.join(config.LOG_DIR, config.LOG_FILE_NAME)
     logging.basicConfig(
         level=logging.INFO,

@@ -1,5 +1,5 @@
 import os
-from typing import Literal
+from typing import Literal, Pattern, AnyStr
 
 from dotenv import load_dotenv
 import re
@@ -19,11 +19,6 @@ class Config(BaseModel):
     MESSAGES_DIR: Literal["messages"] = "messages"
     MESSAGES_FILE: Literal["messages.json"] = "messages.json"
 
-    EMAIL_PATTERN = re.compile(r"[^@]+@[^@]+\.[^@]+")
-    PHONE_PATTERN = re.compile(
-        r"^(?:\+7|8)[- ]?(?:\d{3}[- ]?\d{3}[- ]?\d{2}[- ]?\d{2})$"
-    )
-
     LOG_DIR: str = "logs"
     LOG_FILE_NAME: str = "logs.log"
     OUTPUT_LOG_FILE_NAME: str = "logs.txt"
@@ -40,8 +35,8 @@ class Config(BaseModel):
             raise ValueError("Invalid Admin chat_id format")
         return value
 
-    @validator("VERSION", pre=True, always=True)
-    def validate_and_process_version(cls, value):
-        if not re.match(r"^-?\d+$", value):
-            raise ValueError("Invalid version format")
-        return value
+
+EMAIL_PATTERN: Pattern = re.compile(r"[^@]+@[^@]+\.[^@]+")
+PHONE_PATTERN: Pattern = re.compile(
+    r"^(?:\+7|8)[- ]?(?:\d{3}[- ]?\d{3}[- ]?\d{2}[- ]?\d{2})$"
+)
