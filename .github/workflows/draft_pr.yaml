@@ -1,0 +1,47 @@
+name: Create Draft PR on New Branch
+
+on:
+  push:
+    branches-ignore:
+      - master
+
+jobs:
+  create_pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create Draft PR if it doesn't exist
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          BRANCH_NAME: ${{ github.ref }}
+        run: |
+          # Strip the refs/heads/ prefix from the branch name
+          BRANCH_NAME=${BRANCH_NAME#refs/heads/}
+          
+          echo "Checking PRs from $BRANCH_NAME to master"
+          
+          # List all open PRs
+          echo "Listing all open PRs:"
+          gh api "repos/$GITHUB_REPOSITORY/pulls" --method GET -H "Accept: application/vnd.github.v3+json" | jq '.[] | .head.ref'
+          
+          # Fetch PRs from the current branch to master and filter with exact match
+          pr_matches=$(gh api "repos/$GITHUB_REPOSITORY/pulls" --method GET -H "Accept: application/vnd.github.v3+json" --field base=master | jq "[.[] | select(.head.ref == \"$BRANCH_NAME\")]")
+          pr_count=$(echo "$pr_matches" | jq 'length')
+          
+          echo "PR Count: $pr_count"
+          
+          # If we find a PR from the branch to master, print its details
+          if [[ "$pr_count" -ne 0 ]]; then
+            echo "Details of the PR from $BRANCH_NAME to master:"
+            echo "$pr_matches" | jq '.[] | {title: .title, state: .state, branch: .head.ref, url: .html_url}'
+          fi
+          
+          # If the count is 0, no PR exists from this branch to master
+          if [[ "$pr_count" -eq 0 ]]; then
+            echo "No PR exists from $BRANCH_NAME to master. Attempting to create one."
+            gh pr create --base master --head $BRANCH_NAME --title "Merge $BRANCH_NAME into master" --body "Draft PR for $BRANCH_NAME." --draft
+          else
+            echo "A PR from $BRANCH_NAME to master already exists!"
+          fi
