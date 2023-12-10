@@ -1,10 +1,44 @@
 import json
 import os
-from typing import Dict, Any
+
+import requests
+from requests import Response
+from pydantic import BaseModel
+from typing import Dict, Any, Optional, List
 from typeguard import typechecked
 from logging import Logger
 from .consts import Config
 from datetime import date
+from .prompts import Prompts
+
+
+class Report(BaseModel):
+    isInjured: bool = False
+    allDaysDone: bool = True
+    allExercisesDone: bool = True
+    ProblematicExercises: List[str] = []
+    Comments: Optional[str] = None
+
+
+class ReportWithMetadata(Report):
+    TgId: int
+    Year: int
+    Week: int
+
+    @classmethod
+    def from_report_and_metadata(
+        cls, report: Report, tg_id: int, year: int, week: int
+    ) -> "ReportWithMetadata":
+        return cls(
+            TgId=tg_id,
+            Year=year,
+            Week=week,
+            isInjured=report.isInjured,
+            allDaysDone=report.allDaysDone,
+            allExercisesDone=report.allExercisesDone,
+            ProblematicExercises=report.ProblematicExercises,
+            Comments=report.Comments,
+        )
 
 
 @typechecked
@@ -32,7 +66,9 @@ def convert_json_personal_training_to_human_readable(data: Dict[str, Any]) -> st
     day: int = int(data["Day"])
 
     # Форматируем заголовок
-    title = f"День {day} КД {week} Год {year} - еще одна тренировочка, солнышко!!! 🌞\n"
+    title: str = (
+        f"День {day} КД {week} Год {year} - еще одна тренировочка, солнышко!!! 🌞\n"
+    )
     output.append(title)
 
     # Форматируем зал или улица
@@ -95,3 +131,37 @@ def is_client(cfg: Config, user_chat_id: str) -> bool:
 @typechecked
 def fetch_calender_week() -> int:
     return date.today().isocalendar()[1]
+
+
+@typechecked
+def format_report_with_gpt(
+    cfg: Config, prompts: Prompts, tg_id: int, year: int, week: int, client_report: str
+) -> ReportWithMetadata:
+    messages: List[Dict[str, str]] = [
+        {"role": "system", "content": prompts.System},
+        {"role": "user", "content": client_report},
+    ]
+
+    headers: Dict[str, str] = {
+        "Authorization": f"Bearer {cfg.OPENAI_API_KEY}",
+        "Content-Type": "application/json",
+    }
+    data: Dict[str, Any] = {"model": cfg.MODEL_TYPE, "messages": messages}
+
+    response: Response = requests.post(cfg.OPENAI_API_URL, json=data, headers=headers)
+    response.raise_for_status()
+    json_response: Dict[str, Any] = response.json()
+
+    # Process the last response from the assistant to create the Report object
+    # Assuming the last message contains the response in JSON format
+    last_response: str = json_response["choices"][0]["message"]["content"]
+    last_response = last_response.replace("False", "false").replace("True", "true")
+    try:
+        report_data: Dict[str, Any] = json.loads(last_response)
+    except json.decoder.JSONDecodeError:
+        cleaned_response = last_response.strip("`")
+        report_data = json.loads(cleaned_response)
+    report: Report = Report(**report_data)
+    return ReportWithMetadata.from_report_and_metadata(
+        report=report, tg_id=tg_id, year=year, week=week
+    )

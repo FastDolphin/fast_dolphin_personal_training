@@ -20,10 +20,14 @@ class Config(BaseModel):
     MAX_MESSAGE_LENGTH: int = 4090
     MESSAGES_DIR: Literal["messages"] = "messages"
     MESSAGES_FILE: Literal["messages.json"] = "messages.json"
+    OPENAI_API_KEY: str = os.environ["OPENAI_API_KEY"]
 
     LOG_DIR: str = "logs"
     LOG_FILE_NAME: str = "logs.log"
     OUTPUT_LOG_FILE_NAME: str = "logs.txt"
+
+    OPENAI_API_URL: str = "https://api.openai.com/v1/chat/completions"
+    MODEL_TYPE: str = "gpt-4"
 
     @validator("TOKEN", pre=True, always=True)
     def validate_and_process_token(cls, value):

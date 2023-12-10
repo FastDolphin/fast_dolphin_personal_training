@@ -5,5 +5,8 @@ from .utils import (
     is_client,
     is_admin,
     fetch_calender_week,
+    format_report_with_gpt,
+    ReportWithMetadata,
 )
 from .commands import Commands
+from .prompts import Prompts
