@@ -1,1 +1,1 @@
-from .send_menu import get_send_menu_handler
+from .send_menu import get_send_menu_handler, send_menu_handler_factory

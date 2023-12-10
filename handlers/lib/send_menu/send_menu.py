@@ -1,17 +1,15 @@
 from typing import Callable
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     CallbackContext,
     CommandHandler,
 )
-from utils import Config, Commands
+from utils import Config
 from typeguard import typechecked
 
 
 @typechecked
-def send_menu_handler_factory(
-    cfg: Config, commands: Commands
-) -> Callable[[Update, CallbackContext], None]:
+def send_menu_handler_factory(cfg: Config) -> Callable[[Update, CallbackContext], None]:
     @typechecked
     def send_menu(update: Update, context: CallbackContext) -> None:
         if update.effective_chat is None:
@@ -19,25 +17,37 @@ def send_menu_handler_factory(
 
         user_chat_id = str(update.effective_chat.id)
 
-        commands_text: str
-        if user_chat_id == cfg.ADMIN_CHAT_ID:
-            commands_text = "\n".join(
-                [f"{cmd} - {desc}" for cmd, desc in commands.ADMIN.items()]
-            )
-        elif user_chat_id == cfg.CLIENT_CHAT_ID:
-            commands_text = "\n".join(
-                [f"{cmd} - {desc}" for cmd, desc in commands.CLIENT.items()]
-            )
+        keyboard = []
 
-        else:
-            commands_text = "\n".join(
-                [f"{cmd} - {desc}" for cmd, desc in commands.USER.items()]
+        description_button: InlineKeyboardButton = InlineKeyboardButton(
+            "🔍 Как работает этот бот?", callback_data="get_description"
+        )
+        personal_training_button: InlineKeyboardButton = InlineKeyboardButton(
+            "🦾 Получить тренировку", callback_data="get_personal_training"
+        )
+        send_report: InlineKeyboardButton = InlineKeyboardButton(
+            "📝  Написать отчет", callback_data="send_report"
+        )
+
+        if user_chat_id in [cfg.ADMIN_CHAT_ID, cfg.CLIENT_CHAT_ID]:
+            keyboard.extend(
+                [[description_button], [personal_training_button], [send_report]]
             )
-        context.bot.send_message(chat_id=update.effective_chat.id, text=commands_text)
+        else:  # Authorized (regular) users get only the menu button
+            keyboard.append([description_button])
+
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="Выберите опцию:",
+            reply_markup=reply_markup,
+        )
+
     return send_menu
 
 
 @typechecked
-def get_send_menu_handler(cfg: Config, commands: Commands) -> CommandHandler:
-    send_menu_handler = send_menu_handler_factory(cfg, commands)
+def get_send_menu_handler(cfg: Config) -> CommandHandler:
+    send_menu_handler = send_menu_handler_factory(cfg)
     return CommandHandler("menu", send_menu_handler)
