@@ -26,8 +26,11 @@ def send_personal_training_handler_factory(
     ) -> None:
         if update.effective_chat is None:
             raise TypeError
+        elif isinstance(update.effective_chat.id, int):
+            user_chat_id = str(update.effective_chat.id)
+        else:
+            raise TypeError
 
-        user_chat_id = str(update.effective_chat.id)
         current_calender_week: int = fetch_calender_week()
         params = {
             "tg_id": user_chat_id,
