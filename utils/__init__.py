@@ -7,6 +7,8 @@ from .utils import (
     fetch_calender_week,
     format_report_with_gpt,
     ReportWithMetadata,
+    MetaData,
+    fetch_current_year,
 )
 from .commands import Commands
 from .prompts import Prompts

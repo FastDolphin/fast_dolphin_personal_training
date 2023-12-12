@@ -17,6 +17,9 @@ class Config(BaseModel):
     VERSION: str = os.environ["VERSION"]
     BACKEND_API: str = os.environ["BACKEND_API"]
     PERSONAL_TRAINING_ENDPOINT: str = os.environ["PERSONAL_TRAINING_ENDPOINT"]
+    CURRENT_PERSONAL_TRAINING_ENDPOINT: str = os.environ[
+        "CURRENT_PERSONAL_TRAINING_ENDPOINT"
+    ]
     CLIENT_REPORT_ENDPOINT: str = os.environ["CLIENT_REPORT_ENDPOINT"]
     MAX_MESSAGE_LENGTH: int = 4090
     MESSAGES_DIR: Literal["messages"] = "messages"

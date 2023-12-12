@@ -20,6 +20,12 @@ class Report(BaseModel):
     Comments: Optional[str] = None
 
 
+class MetaData(BaseModel):
+    TgId: int
+    Year: int
+    Week: int
+
+
 class ReportWithMetadata(Report):
     TgId: int
     Year: int
@@ -27,12 +33,12 @@ class ReportWithMetadata(Report):
 
     @classmethod
     def from_report_and_metadata(
-        cls, report: Report, tg_id: int, year: int, week: int
+        cls, report: Report, metadata: MetaData
     ) -> "ReportWithMetadata":
         return cls(
-            TgId=tg_id,
-            Year=year,
-            Week=week,
+            TgId=metadata.TgId,
+            Year=metadata.Year,
+            Week=metadata.Week,
             isInjured=report.isInjured,
             allDaysDone=report.allDaysDone,
             allExercisesDone=report.allExercisesDone,
@@ -134,8 +140,13 @@ def fetch_calender_week() -> int:
 
 
 @typechecked
+def fetch_current_year() -> int:
+    return date.today().year
+
+
+@typechecked
 def format_report_with_gpt(
-    cfg: Config, prompts: Prompts, tg_id: int, year: int, week: int, client_report: str
+    cfg: Config, prompts: Prompts, metadata: MetaData, client_report: str
 ) -> ReportWithMetadata:
     messages: List[Dict[str, str]] = [
         {"role": "system", "content": prompts.System},
@@ -162,6 +173,4 @@ def format_report_with_gpt(
         cleaned_response = last_response.strip("`")
         report_data = json.loads(cleaned_response)
     report: Report = Report(**report_data)
-    return ReportWithMetadata.from_report_and_metadata(
-        report=report, tg_id=tg_id, year=year, week=week
-    )
+    return ReportWithMetadata.from_report_and_metadata(report=report, metadata=metadata)

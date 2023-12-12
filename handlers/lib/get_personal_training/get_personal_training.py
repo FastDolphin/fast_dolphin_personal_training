@@ -9,10 +9,13 @@ from utils import (
     Config,
     convert_json_personal_training_to_human_readable,
     fetch_calender_week,
+    fetch_current_year,
 )
 from logging import Logger
 from typeguard import typechecked
 from ..send_menu import send_menu_handler_factory
+from requests import Response
+from utils import MetaData
 
 
 @typechecked
@@ -27,40 +30,41 @@ def send_personal_training_handler_factory(
         if update.effective_chat is None:
             raise TypeError
         elif isinstance(update.effective_chat.id, int):
-            user_chat_id = str(update.effective_chat.id)
+            user_chat_id = update.effective_chat.id
         else:
             raise TypeError
-
+        current_year: int = fetch_current_year()
         current_calender_week: int = fetch_calender_week()
-        params = {
+        get_params: Dict[str, int] = {
             "tg_id": user_chat_id,
             "year": 2023,
             "week": current_calender_week,
         }
 
         logger.info(
-            f"TgId: {user_chat_id}\n"
-            f"User: {user_chat_id} requested training plan for\n"
-            f"Week: {params['week']}"
+            f"User: {get_params['tg_id']} requested training plan for\n"
+            f"Week: {get_params['week']}"
         )
 
         try:
-            # Send request to backend
-            response = requests.get(
+            # ---------------------------------------
+            # ------- Get training plan ---------------
+            # ---------------------------------------
+            get_response: Response = requests.get(
                 f"{cfg.BACKEND_API}/{cfg.VERSION}/{cfg.PERSONAL_TRAINING_ENDPOINT}",
-                params=params,
+                params=get_params,
                 timeout=10,
             )
 
             logger.debug(
-                f"Received HTTP {response.status_code} from backend for training plan request."
+                f"Received HTTP {get_response.status_code} from backend for training plan request."
             )
 
             # Raise exception for HTTP errors
-            response.raise_for_status()
+            get_response.raise_for_status()
 
             # Try parsing the JSON response
-            data = response.json()
+            data = get_response.json()
 
             if isinstance(data, dict):
                 resources: List[Dict[str, Any]] = data["Resources"]
@@ -87,7 +91,49 @@ def send_personal_training_handler_factory(
             else:
                 formatted_data = str(data)
 
-            # Split the formatted_data into chunks to be sent in multiple messages if needed
+            # ---------------------------------------
+            # ------- Update metadata ---------------
+            # ---------------------------------------
+            # Step 1: Delete current metadata -------
+
+            delete_params: Dict[str, int] = {"tg_id": user_chat_id}
+
+            delete_response: Response = requests.delete(
+                f"{cfg.BACKEND_API}/{cfg.VERSION}/{cfg.CURRENT_PERSONAL_TRAINING_ENDPOINT}",
+                params=delete_params,
+                timeout=10,
+            )
+
+            logger.debug(
+                f"Received HTTP {delete_response.status_code} from backend for delete metadata request."
+            )
+
+            if delete_response.status_code == 404:
+                newcomer_welcome: str = messages["newcomer_welcome"]
+                formatted_data = newcomer_welcome + formatted_data
+            elif delete_response.status_code != 204:
+                get_response.raise_for_status()
+
+            # Step 2: Write current metadata --------
+
+            metadata: MetaData = MetaData(
+                TgId=user_chat_id, Year=current_year, Week=current_calender_week
+            )
+            post_response: Response = requests.post(
+                f"{cfg.BACKEND_API}/{cfg.VERSION}/{cfg.CURRENT_PERSONAL_TRAINING_ENDPOINT}",
+                params=delete_params,
+                timeout=10,
+                json=metadata.dict(),
+            )
+            logger.debug(
+                f"Received HTTP {post_response.status_code} from backend for post metadata request."
+            )
+            post_response.raise_for_status()
+
+            # ---------------------------------------
+            # ------- Respond to user ---------------
+            # ---------------------------------------
+
             data_chunks = [
                 formatted_data[i : i + cfg.MAX_MESSAGE_LENGTH]
                 for i in range(0, len(formatted_data), cfg.MAX_MESSAGE_LENGTH)
@@ -109,8 +155,8 @@ def send_personal_training_handler_factory(
             logger.error(f"Request to backend failed with error: {str(e)}")
             context.bot.send_message(
                 chat_id=update.effective_chat.id,
-                text=messages["no_personal_training"].format(
-                    calender_week=current_calender_week
+                text=messages["exception"].format(
+                    exception=str(e)
                 ),
             )
         except ValueError:  # This will catch non-JSON parsable responses
