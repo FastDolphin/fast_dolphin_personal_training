@@ -121,7 +121,6 @@ def send_personal_training_handler_factory(
             )
             post_response: Response = requests.post(
                 f"{cfg.BACKEND_API}/{cfg.VERSION}/{cfg.CURRENT_PERSONAL_TRAINING_ENDPOINT}",
-                params=delete_params,
                 timeout=10,
                 json=metadata.dict(),
             )
@@ -155,9 +154,7 @@ def send_personal_training_handler_factory(
             logger.error(f"Request to backend failed with error: {str(e)}")
             context.bot.send_message(
                 chat_id=update.effective_chat.id,
-                text=messages["exception"].format(
-                    exception=str(e)
-                ),
+                text=messages["exception"].format(exception=str(e)),
             )
         except ValueError:  # This will catch non-JSON parsable responses
             logger.error(
