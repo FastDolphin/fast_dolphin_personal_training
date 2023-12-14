@@ -12,9 +12,7 @@ class Config(BaseModel):
     TOKEN: str = os.environ["TELEGRAM_TOKEN"]
     ADMIN_NAME: str = os.environ["ADMIN_NAME"]
     ADMIN_CHAT_ID: str = os.environ["ADMIN_CHAT_ID"]
-    CLIENT_NAME: str = os.environ["CLIENT_NAME"]
     CLIENT_CHAT_ID: str = os.environ["CLIENT_CHAT_ID"]
-    VERSION: str = os.environ["VERSION"]
     BACKEND_API: str = os.environ["BACKEND_API"]
     PERSONAL_TRAINING_ENDPOINT: str = os.environ["PERSONAL_TRAINING_ENDPOINT"]
     CURRENT_PERSONAL_TRAINING_ENDPOINT: str = os.environ[
