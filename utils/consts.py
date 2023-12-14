@@ -20,7 +20,7 @@ class Config(BaseModel):
     CURRENT_PERSONAL_TRAINING_ENDPOINT: str = os.environ[
         "CURRENT_PERSONAL_TRAINING_ENDPOINT"
     ]
-    CLIENT_REPORT_ENDPOINT: str = os.environ["CLIENT_REPORT_ENDPOINT"]
+    PERSONAL_TRAINING_REPORT: str = os.environ["PERSONAL_TRAINING_REPORT"]
     MAX_MESSAGE_LENGTH: int = 4090
     MESSAGES_DIR: Literal["messages"] = "messages"
     MESSAGES_FILE: Literal["messages.json"] = "messages.json"
