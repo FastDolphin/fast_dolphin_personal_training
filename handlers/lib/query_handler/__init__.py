@@ -1,0 +1,1 @@
+from .query_handler import get_callback_query_handler

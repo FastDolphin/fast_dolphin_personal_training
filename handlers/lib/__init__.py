@@ -1,2 +1,5 @@
 from .start import get_start_handler
 from .send_menu import get_send_menu_handler
+from .query_handler import get_callback_query_handler
+from .get_personal_training import get_training_plan_conversation_handler
+from .send_report import get_send_report_handler
