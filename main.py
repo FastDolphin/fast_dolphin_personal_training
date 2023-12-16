@@ -16,6 +16,7 @@ from handlers import (
     get_callback_query_handler,
     get_training_plan_conversation_handler,
     get_send_report_handler,
+    get_authorize_handler,
 )
 
 
@@ -45,10 +46,14 @@ def main() -> None:
     send_report_handler: ConversationHandler = get_send_report_handler(
         cfg, prompts, logger, messages
     )
+    authorize_handler: ConversationHandler = get_authorize_handler(
+        cfg, logger, messages
+    )
 
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(personal_training_handler)
     dispatcher.add_handler(send_report_handler)
+    dispatcher.add_handler(authorize_handler)
     dispatcher.add_handler(send_menu_command_handler)
     dispatcher.add_handler(query_handler)
 

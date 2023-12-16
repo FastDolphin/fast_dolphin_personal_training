@@ -14,11 +14,13 @@ class Config(BaseModel):
     ADMIN_CHAT_ID: str = os.environ["ADMIN_CHAT_ID"]
     CLIENT_CHAT_ID: str = os.environ["CLIENT_CHAT_ID"]
     BACKEND_API: str = os.environ["BACKEND_API"]
+    VERSION: str = "v1"
     PERSONAL_TRAINING_ENDPOINT: str = os.environ["PERSONAL_TRAINING_ENDPOINT"]
     CURRENT_PERSONAL_TRAINING_ENDPOINT: str = os.environ[
         "CURRENT_PERSONAL_TRAINING_ENDPOINT"
     ]
     PERSONAL_TRAINING_REPORT: str = os.environ["PERSONAL_TRAINING_REPORT"]
+    ALLOWED_PERSONAL_TRAINING: str = os.environ["ALLOWED_PERSONAL_TRAINING"]
     MAX_MESSAGE_LENGTH: int = 4090
     MESSAGES_DIR: Literal["messages"] = "messages"
     MESSAGES_FILE: Literal["messages.json"] = "messages.json"

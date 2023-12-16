@@ -9,6 +9,7 @@ from .utils import (
     ReportWithMetadata,
     MetaData,
     fetch_current_year,
+    has_access,
 )
 from .commands import Commands
 from .prompts import Prompts

@@ -174,3 +174,16 @@ def format_report_with_gpt(
         report_data = json.loads(cleaned_response)
     report: Report = Report(**report_data)
     return ReportWithMetadata.from_report_and_metadata(report=report, metadata=metadata)
+
+
+@typechecked
+def has_access(cfg: Config, api_token: str) -> bool:
+    params: Dict[str, str] = {"api_key": api_token}
+    get_request: Response = requests.get(
+        f"{cfg.BACKEND_API}/{cfg.VERSION}/{cfg.ALLOWED_PERSONAL_TRAINING}",
+        params=params,
+    )
+    get_request.raise_for_status()
+    result: Dict[str, Any] = get_request.json()
+    is_allowed: bool = result["Resources"][0]["Allowed"]
+    return is_allowed
