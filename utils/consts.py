@@ -9,7 +9,7 @@ load_dotenv()
 
 
 class Config(BaseModel):
-    TOKEN: str = os.environ["TELEGRAM_TOKEN"]
+    TOKEN: str = os.environ["LIUBA_TELEGRAM_TOKEN"]
     ADMIN_NAME: str = os.environ["ADMIN_NAME"]
     ADMIN_CHAT_ID: str = os.environ["ADMIN_CHAT_ID"]
     CLIENT_CHAT_ID: str = os.environ["CLIENT_CHAT_ID"]
