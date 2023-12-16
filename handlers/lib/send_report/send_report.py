@@ -1,3 +1,4 @@
+import os
 import json
 from typing import Dict, Any, Union, List
 import requests
@@ -43,6 +44,10 @@ def send_report_handler_factory(
         params = {
             "tg_id": user_chat_id,
         }
+        headers: Dict[str, str] = {
+            "accept": "application/json",
+            "X-API-Key": os.environ["X-API-Key"],
+        }
 
         logger.info(f"User: {user_chat_id} requested current training plan idx\n")
 
@@ -50,6 +55,7 @@ def send_report_handler_factory(
             # Send request to backend
             get_response: Response = requests.get(
                 f"{cfg.BACKEND_API}/{cfg.VERSION}/{cfg.CURRENT_PERSONAL_TRAINING_ENDPOINT}",
+                headers=headers,
                 params=params,
                 timeout=10,
             )
@@ -101,6 +107,7 @@ def send_report_handler_factory(
 
                             post_response: Response = requests.post(
                                 f"{cfg.BACKEND_API}/{cfg.VERSION}/{cfg.PERSONAL_TRAINING_REPORT}",
+                                headers=headers,
                                 timeout=10,
                                 json=report.dict(),
                             )

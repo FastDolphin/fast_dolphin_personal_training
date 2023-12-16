@@ -1,3 +1,4 @@
+import os
 from typing import Dict, Any, List, Callable
 from telegram import Update
 from telegram.ext import (
@@ -40,6 +41,10 @@ def send_personal_training_handler_factory(
             "year": 2023,
             "week": current_calender_week,
         }
+        headers: Dict[str, str] = {
+            "accept": "application/json",
+            "X-API-Key": os.environ["X-API-Key"],
+        }
 
         logger.info(
             f"User: {get_params['tg_id']} requested training plan for\n"
@@ -53,6 +58,7 @@ def send_personal_training_handler_factory(
             get_response: Response = requests.get(
                 f"{cfg.BACKEND_API}/{cfg.VERSION}/{cfg.PERSONAL_TRAINING_ENDPOINT}",
                 params=get_params,
+                headers=headers,
                 timeout=10,
             )
 
@@ -100,6 +106,7 @@ def send_personal_training_handler_factory(
 
             delete_response: Response = requests.delete(
                 f"{cfg.BACKEND_API}/{cfg.VERSION}/{cfg.CURRENT_PERSONAL_TRAINING_ENDPOINT}",
+                headers=headers,
                 params=delete_params,
                 timeout=10,
             )
@@ -121,6 +128,7 @@ def send_personal_training_handler_factory(
             )
             post_response: Response = requests.post(
                 f"{cfg.BACKEND_API}/{cfg.VERSION}/{cfg.CURRENT_PERSONAL_TRAINING_ENDPOINT}",
+                headers=headers,
                 timeout=10,
                 json=metadata.dict(),
             )

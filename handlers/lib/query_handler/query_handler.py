@@ -46,10 +46,10 @@ def callback_query_handler_factory(
             )
             personal_training_handler(update, context)
 
-        else:
-            context.bot.send_message(
-                chat_id=update.effective_chat.id, text="Доступ запрещен."
-            )
+        # else:
+        #     context.bot.send_message(
+        #         chat_id=update.effective_chat.id, text="Доступ запрещен."
+        #     )
 
     return callback_query
 
