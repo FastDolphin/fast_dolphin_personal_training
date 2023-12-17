@@ -14,12 +14,12 @@ RUN apt-get update -y && \
     apt-get install -y libssl-dev libffi-dev python3-dev
 
 # Copy the requirements.txt file and install Python dependencies
-COPY ./fast_dolphin_personal_training_bot/requirements.txt /app/requirements.txt
+COPY ./fast_dolphin_personal_training/requirements.txt /app/requirements.txt
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy the application code and files
-COPY ./fast_dolphin_personal_training_bot /app/
+COPY ./fast_dolphin_personal_training /app/
 
 # Set environment variables
 ENV TELEGRAM_TOKEN=$TELEGRAM_TOKEN
