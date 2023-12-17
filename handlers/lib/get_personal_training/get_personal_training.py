@@ -122,7 +122,6 @@ def send_personal_training_handler_factory(
                 get_response.raise_for_status()
 
             # Step 2: Write current metadata --------
-
             metadata: MetaData = MetaData(
                 TgId=user_chat_id, Year=current_year, Week=current_calender_week
             )

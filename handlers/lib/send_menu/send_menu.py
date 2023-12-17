@@ -16,7 +16,6 @@ def send_menu_handler_factory(cfg: Config) -> Callable[[Update, CallbackContext]
         if update.effective_chat is None:
             raise TypeError
 
-        # user_chat_id = str(update.effective_chat.id)
         keyboard = []
         authorize_button: InlineKeyboardButton = InlineKeyboardButton(
             "🧐️️️️️️ Авторизация", callback_data="get_token"
@@ -39,7 +38,6 @@ def send_menu_handler_factory(cfg: Config) -> Callable[[Update, CallbackContext]
             keyboard.append([authorize_button])
 
         elif has_access(cfg, api_key):
-            # if user_chat_id in [cfg.ADMIN_CHAT_ID, cfg.CLIENT_CHAT_ID]:
             keyboard.extend(
                 [[description_button], [personal_training_button], [send_report]]
             )

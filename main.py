@@ -40,7 +40,7 @@ def main() -> None:
         messages,
     )
     query_handler: CallbackQueryHandler = get_callback_query_handler(
-        cfg, prompts, logger, messages
+        cfg, logger, messages
     )
 
     send_report_handler: ConversationHandler = get_send_report_handler(

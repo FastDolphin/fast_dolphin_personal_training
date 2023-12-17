@@ -3,6 +3,7 @@ from telegram import Update
 from utils import Config
 from typeguard import typechecked
 from telegram.ext import CallbackContext, CommandHandler
+from ..send_menu import send_menu_handler_factory
 
 
 @typechecked
@@ -19,14 +20,14 @@ def start_handler_factory(
             greeting_message = messages["start_message_admin"].format(
                 admin_name=cfg.ADMIN_NAME
             )
-        elif user_chat_id == cfg.CLIENT_CHAT_ID:
-            greeting_message = messages["start_message_client"]
         else:
             greeting_message = messages["start_message"]
 
         context.bot.send_message(
             chat_id=update.effective_chat.id, text=greeting_message
         )
+        send_menu_handler = send_menu_handler_factory(cfg)
+        send_menu_handler(update, context)
 
     return start
 

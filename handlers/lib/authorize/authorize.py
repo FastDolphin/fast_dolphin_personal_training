@@ -39,7 +39,7 @@ def authorize_handler_factory(cfg: Config, logger: Logger, messages: Dict[str, A
         context.user_data["api_token"] = update.message.text
         user_chat_id = str(update.effective_chat.id)
 
-        params = {
+        get_params: Dict[str, str] = {
             "api_key": context.user_data["api_token"],
         }
 
@@ -50,7 +50,7 @@ def authorize_handler_factory(cfg: Config, logger: Logger, messages: Dict[str, A
         try:
             get_response: Response = requests.get(
                 f"{cfg.BACKEND_API}/{cfg.VERSION}/{cfg.ALLOWED_PERSONAL_TRAINING}",
-                params=params,
+                params=get_params,
                 timeout=10,
             )
 
@@ -74,9 +74,7 @@ def authorize_handler_factory(cfg: Config, logger: Logger, messages: Dict[str, A
             if isinstance(data, dict):
                 resources: List[Dict[str, Any]] = data["Resources"]
                 if not resources:  # If list is empty
-                    logger.warning(
-                        f"No current training plans found for user {user_chat_id}."
-                    )
+                    logger.warning(f"No token found for user {user_chat_id}.")
                     context.bot.send_message(
                         chat_id=update.effective_chat.id, text="Такого токена нет :("
                     )
@@ -89,6 +87,22 @@ def authorize_handler_factory(cfg: Config, logger: Logger, messages: Dict[str, A
                                 context.bot.send_message(
                                     chat_id=update.effective_chat.id,
                                     text="Отлично! Солнышко, я тебя узнал! Ты моя умничка, давай начнем тренировки!!!",
+                                )
+
+                                put_params: Dict[str, int] = {
+                                    "api_key": context.user_data["api_token"],
+                                    "tg_id": update.effective_chat.id,
+                                }
+
+                                put_response: Response = requests.put(
+                                    f"{cfg.BACKEND_API}/{cfg.VERSION}/{cfg.ALLOWED_PERSONAL_TRAINING_UPDATE_METADATA}",
+                                    params=put_params,
+                                    timeout=10,
+                                )
+                                put_response.raise_for_status()
+                                logger.info(
+                                    f"Updated metadata for token: {context.user_data['api_token']} \n "
+                                    f"with tg_id: {update.effective_chat.id}"
                                 )
                                 send_menu_handler = send_menu_handler_factory(cfg)
                                 send_menu_handler(update, context)
