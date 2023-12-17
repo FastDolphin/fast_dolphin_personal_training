@@ -175,7 +175,10 @@ def has_access(cfg: Config, api_token: str) -> bool:
         f"{cfg.BACKEND_API}/{cfg.VERSION}/{cfg.ALLOWED_PERSONAL_TRAINING}",
         params=params,
     )
-    get_request.raise_for_status()
+    if get_request.status_code != 403:
+        get_request.raise_for_status()
+    else:
+        return False
     result: Dict[str, Any] = get_request.json()
     is_allowed: bool = result["Resources"][0]["Allowed"]
     return is_allowed

@@ -17,7 +17,7 @@ def start_handler_factory(
             raise TypeError
         user_chat_id: str = str(update.effective_chat.id)
         greeting_message: str
-        api_key: Union[str, None] = os.getenv("X-API-Key", None)
+        api_key: str = os.getenv("X-API-Key", "")
 
         if user_chat_id == cfg.ADMIN_CHAT_ID:
             greeting_message = messages["start_message_admin"].format(
