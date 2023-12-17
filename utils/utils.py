@@ -118,20 +118,12 @@ def convert_json_personal_training_to_human_readable(data: Dict[str, Any]) -> st
     output.append(
         f"⏱ Общее время тренировки: примерно {total_time} минут - замечательно!"
     )
-
     return "\n".join(output)
-
-    # return "Yet such."
 
 
 @typechecked
 def is_admin(cfg: Config, user_chat_id: str) -> bool:
     return user_chat_id == cfg.ADMIN_CHAT_ID
-
-
-@typechecked
-def is_client(cfg: Config, user_chat_id: str) -> bool:
-    return user_chat_id in cfg.CLIENT_CHAT_ID
 
 
 @typechecked

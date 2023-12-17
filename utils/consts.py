@@ -1,6 +1,5 @@
 import os
-from typing import Literal, Pattern, AnyStr
-
+from typing import Literal, Pattern
 from dotenv import load_dotenv
 import re
 from pydantic import BaseModel, validator
@@ -12,7 +11,6 @@ class Config(BaseModel):
     TOKEN: str = os.environ["LIUBA_TELEGRAM_TOKEN"]
     ADMIN_NAME: str = os.environ["ADMIN_NAME"]
     ADMIN_CHAT_ID: str = os.environ["ADMIN_CHAT_ID"]
-    CLIENT_CHAT_ID: str = os.environ["CLIENT_CHAT_ID"]
     BACKEND_API: str = os.environ["BACKEND_API"]
     VERSION: str = "v1"
     PERSONAL_TRAINING_ENDPOINT: str = os.environ["PERSONAL_TRAINING_ENDPOINT"]
@@ -21,6 +19,7 @@ class Config(BaseModel):
     ]
     PERSONAL_TRAINING_REPORT: str = os.environ["PERSONAL_TRAINING_REPORT"]
     ALLOWED_PERSONAL_TRAINING: str = os.environ["ALLOWED_PERSONAL_TRAINING"]
+    ALLOWED_PERSONAL_TRAINING_UPDATE_METADATA: str = os.environ["ALLOWED_PERSONAL_TRAINING_UPDATE_METADATA"]
     MAX_MESSAGE_LENGTH: int = 4090
     MESSAGES_DIR: Literal["messages"] = "messages"
     MESSAGES_FILE: Literal["messages.json"] = "messages.json"
