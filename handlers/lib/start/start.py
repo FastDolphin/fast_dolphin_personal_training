@@ -1,6 +1,7 @@
-from typing import Dict, Any, Callable
+import os
+from typing import Dict, Any, Callable, Union
 from telegram import Update
-from utils import Config
+from utils import Config, has_access
 from typeguard import typechecked
 from telegram.ext import CallbackContext, CommandHandler
 from ..send_menu import send_menu_handler_factory
@@ -16,10 +17,14 @@ def start_handler_factory(
             raise TypeError
         user_chat_id: str = str(update.effective_chat.id)
         greeting_message: str
+        api_key: Union[str, None] = os.getenv("X-API-Key", None)
+
         if user_chat_id == cfg.ADMIN_CHAT_ID:
             greeting_message = messages["start_message_admin"].format(
                 admin_name=cfg.ADMIN_NAME
             )
+        elif has_access(cfg, api_key):
+            greeting_message = messages["start_message_client"]
         else:
             greeting_message = messages["start_message"]
 
