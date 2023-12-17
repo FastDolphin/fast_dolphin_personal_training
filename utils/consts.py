@@ -20,6 +20,7 @@ class Config(BaseModel):
     PERSONAL_TRAINING_REPORT: str = os.environ["PERSONAL_TRAINING_REPORT"]
     ALLOWED_PERSONAL_TRAINING: str = os.environ["ALLOWED_PERSONAL_TRAINING"]
     ALLOWED_PERSONAL_TRAINING_UPDATE_METADATA: str = os.environ["ALLOWED_PERSONAL_TRAINING_UPDATE_METADATA"]
+    UPDATE_PERSONAL_TRAINING_TG_ID: str = os.environ["UPDATE_PERSONAL_TRAINING_TG_ID"]
     MAX_MESSAGE_LENGTH: int = 4090
     MESSAGES_DIR: Literal["messages"] = "messages"
     MESSAGES_FILE: Literal["messages.json"] = "messages.json"
