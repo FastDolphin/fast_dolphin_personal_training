@@ -89,7 +89,7 @@ def authorize_handler_factory(cfg: Config, logger: Logger, messages: Dict[str, A
                                     text="Отлично! Солнышко, я тебя узнал! Ты моя умничка, давай начнем тренировки!!!",
                                 )
 
-                                put_params: Dict[str, int] = {
+                                put_params: Dict[str, Any] = {
                                     "api_key": context.user_data["api_token"],
                                     "tg_id": update.effective_chat.id,
                                 }
