@@ -31,10 +31,6 @@ def send_menu_handler_factory(cfg: Config) -> Callable[[Update, CallbackContext]
         send_report: InlineKeyboardButton = InlineKeyboardButton(
             "📝  Написать отчет", callback_data="send_report"
         )
-        ask_for_access_button: InlineKeyboardButton = InlineKeyboardButton(
-            "😫️️️️️️Запросить доступ", callback_data="ask_for_access"
-        )
-
         api_key: str = os.getenv("X-API-Key", "")
         if has_access(cfg, api_key) or is_admin(cfg, user_chat_id=str(user_chat_id)):
             keyboard.extend(
