@@ -26,7 +26,7 @@ def authorize_handler_factory(cfg: Config, logger: Logger, messages: Dict[str, A
             raise ValueError
         context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text="Пожалуйста, введите ваш токен:",
+            text=messages["please_write_token"],
         )
         return TOKEN
 
