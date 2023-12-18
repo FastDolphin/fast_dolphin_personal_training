@@ -29,7 +29,7 @@ def send_report_handler_factory(
             raise ValueError
         context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text="Пожалуйста, напишите свой отчет о тренировке:",
+            text=messages["please_write_report"],
         )
         return CLIENT_REPORT
 
