@@ -9,6 +9,7 @@ from .utils import (
     MetaData,
     fetch_current_year,
     has_access,
+    load_messages_v2,
 )
 from .commands import Commands
 from .prompts import Prompts

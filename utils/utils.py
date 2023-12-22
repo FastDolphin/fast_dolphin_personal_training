@@ -63,6 +63,35 @@ def load_messages(message_path: str, logger: Logger) -> Dict[str, Any]:
 
 
 @typechecked
+def load_messages_v2(
+    api_url: str, api_key: Optional[str], tg_id: Optional[int], logger: Logger
+) -> Dict[str, Any]:
+    params = {}
+    if api_key:
+        params["api_key"] = api_key
+    if tg_id:
+        params["tg_id"] = tg_id
+
+    try:
+        response = requests.get(api_url, params=params)
+
+        if response.status_code == 200:
+            data = response.json()
+            messages = data.get("Resources", [])
+            logger.info("Successfully fetched messages from the server")
+            return messages
+        else:
+            logger.error(
+                f"Failed to fetch messages. Status code: {response.status_code}, Detail: {response.text}"
+            )
+            return {}
+
+    except requests.RequestException as e:
+        logger.error(f"An error occurred while fetching messages: {e}")
+        return {}
+
+
+@typechecked
 def convert_json_personal_training_to_human_readable(data: Dict[str, Any]) -> str:
     output = []
     # Извлекаем общие данные
