@@ -1,0 +1,240 @@
+{
+  "Resources": [
+    {
+      "TgIdYearWeekDay": "4006770072023521",
+      "ApiKeyYearWeekDay": "d9745f74-7e45-438d-9ff7-d9e6771ea8df2023521",
+      "TgId": 400677007,
+      "ApiKey": "d9745f74-7e45-438d-9ff7-d9e6771ea8df",
+      "Year": 2023,
+      "Week": 52,
+      "Day": 1,
+      "trainingType": "swimming",
+      "inGym": false,
+      "inSwimmingPool": true,
+      "Exercises": [
+        {
+          "Volume": 200,
+          "VolumeUnits": "m",
+          "Time": null,
+          "TimeUnits": "min",
+          "Stroke": "кроль",
+          "Speed": 1,
+          "Legs": false,
+          "Arms": false,
+          "Equipment": {
+            "Paddles": false,
+            "KickBoard": false,
+            "PullBuoy": false,
+            "Snorkel": false,
+            "Other": ""
+          },
+          "Comments": "разминка, свободные упражнения"
+        },
+        {
+          "Volume": 600,
+          "VolumeUnits": "m",
+          "Time": null,
+          "TimeUnits": "min",
+          "Stroke": "кроль",
+          "Speed": 2,
+          "Legs": true,
+          "Arms": true,
+          "Equipment": {
+            "Paddles": false,
+            "KickBoard": false,
+            "PullBuoy": false,
+            "Snorkel": false,
+            "Other": ""
+          },
+          "Comments": "15 проныр дельфином спринт + 85 кроль в/к спокойно"
+        },
+        {
+          "Volume": 400,
+          "VolumeUnits": "m",
+          "Time": null,
+          "TimeUnits": "min",
+          "Stroke": "батт/кроль",
+          "Speed": 3,
+          "Legs": true,
+          "Arms": false,
+          "Equipment": {
+            "Paddles": false,
+            "KickBoard": false,
+            "PullBuoy": false,
+            "Snorkel": false,
+            "Other": ""
+          },
+          "Comments": "16х25: батт в/к + кроль в/к (скорость как на 200) п/о 20-30с"
+        },
+        {
+          "Volume": 100,
+          "VolumeUnits": "m",
+          "Time": null,
+          "TimeUnits": "min",
+          "Stroke": "батт",
+          "Speed": 6,
+          "Legs": true,
+          "Arms": true,
+          "Equipment": {
+            "Paddles": false,
+            "KickBoard": false,
+            "PullBuoy": false,
+            "Snorkel": false,
+            "Other": ""
+          },
+          "Comments": "4х25: батт спринт с/с"
+        },
+        {
+          "Volume": 600,
+          "VolumeUnits": "m",
+          "Time": null,
+          "TimeUnits": "min",
+          "Stroke": "кроль",
+          "Speed": 2,
+          "Legs": true,
+          "Arms": true,
+          "Equipment": {
+            "Paddles": false,
+            "KickBoard": false,
+            "PullBuoy": false,
+            "Snorkel": false,
+            "Other": ""
+          },
+          "Comments": "все нечетные повороты выход 5 волн"
+        },
+        {
+          "Volume": 100,
+          "VolumeUnits": "m",
+          "Time": null,
+          "TimeUnits": "min",
+          "Stroke": "кроль",
+          "Speed": 1,
+          "Legs": false,
+          "Arms": true,
+          "Equipment": {
+            "Paddles": false,
+            "KickBoard": false,
+            "PullBuoy": true,
+            "Snorkel": false,
+            "Other": ""
+          },
+          "Comments": "свободно"
+        }
+      ],
+      "TotalNumberExercises": 6,
+      "TotalVolume": 2000,
+      "TotalVolumeUnits": "м",
+      "TotalTime": 0
+    },
+     {
+       "TgIdYearWeekDay": "4006770072023521",
+      "ApiKeyYearWeekDay": "d9745f74-7e45-438d-9ff7-d9e6771ea8df2023521",
+      "TgId": 400677007,
+      "ApiKey": "d9745f74-7e45-438d-9ff7-d9e6771ea8df",
+      "Year": 2023,
+      "Week": 52,
+      "Day": 2,
+      "trainingType": "swimming",
+      "inGym": false,
+      "inSwimmingPool": true,
+      "Exercises": [
+        {
+          "Volume": 200,
+          "VolumeUnits": "m",
+          "Time": null,
+          "TimeUnits": "min",
+          "Stroke": "брасс",
+          "Speed": 1,
+          "Legs": false,
+          "Arms": false,
+          "Equipment": {
+            "Paddles": false,
+            "KickBoard": false,
+            "PullBuoy": false,
+            "Snorkel": false,
+            "Other": ""
+          },
+          "Comments": "разминка, свободные упражнения"
+        },
+        {
+          "Volume": 800,
+          "VolumeUnits": "m",
+          "Time": null,
+          "TimeUnits": "min",
+          "Stroke": "к/п",
+          "Speed": 2,
+          "Legs": true,
+          "Arms": true,
+          "Equipment": {
+            "Paddles": false,
+            "KickBoard": false,
+            "PullBuoy": false,
+            "Snorkel": false,
+            "Other": ""
+          },
+          "Comments": "8x100: комплексное плавание, акцент на повороты, п/о 20с"
+        },
+        {
+          "Volume": 100,
+          "VolumeUnits": "m",
+          "Time": null,
+          "TimeUnits": "min",
+          "Stroke": "кроль",
+          "Speed": 1,
+          "Legs": false,
+          "Arms": true,
+          "Equipment": {
+            "Paddles": false,
+            "KickBoard": false,
+            "PullBuoy": true,
+            "Snorkel": false,
+            "Other": ""
+          },
+          "Comments": "свободно"
+        },
+        {
+          "Volume": 600,
+          "VolumeUnits": "m",
+          "Time": null,
+          "TimeUnits": "min",
+          "Stroke": "кроль",
+          "Speed": 2,
+          "Legs": true,
+          "Arms": false,
+          "Equipment": {
+            "Paddles": false,
+            "KickBoard": false,
+            "PullBuoy": false,
+            "Snorkel": false,
+            "Other": ""
+          },
+          "Comments": "4x200: ч. 200: дых. N+1 - N+3 - N - N-1(N)"
+        },
+        {
+          "Volume": 50,
+          "VolumeUnits": "m",
+          "Time": null,
+          "TimeUnits": "min",
+          "Stroke": "кроль, акцент на дыхание",
+          "Speed": 2,
+          "Legs": true,
+          "Arms": true,
+          "Equipment": {
+            "Paddles": false,
+            "KickBoard": false,
+            "PullBuoy": false,
+            "Snorkel": false,
+            "Other": ""
+          },
+          "Comments": "заминка"
+        }
+      ],
+      "TotalNumberExercises": 5,
+      "TotalVolume": 1750,
+      "TotalVolumeUnits": "м",
+      "TotalTime": 0
+    }
+  ],
+  "StatusMessage": "Success",
+  "ErrorMessage": ""
+}
