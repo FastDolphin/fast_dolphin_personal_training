@@ -3,13 +3,40 @@ import os
 
 import requests
 from requests import Response
-from pydantic import BaseModel
-from typing import Dict, Any, Optional, List
+from pydantic import BaseModel, validator
+from typing import Dict, Any, Optional, List, Literal, Union, Final
 from typeguard import typechecked
 from logging import Logger
 from .consts import Config
 from datetime import date
 from .prompts import Prompts
+
+CoordinationType = Union[
+    Literal["в/к"], Literal["н/р"], Literal["н/н"], Literal["упр."]
+]
+
+
+class CommonTrainingInfo(BaseModel):
+    trainingType: Union[Literal["fitness"], Literal["swimming"]]
+    inGym: bool
+    inSwimmingPool: bool
+    Year: int
+    Week: int
+    Day: int
+
+    @validator("inGym")
+    def validate_in_gym(cls, in_gym, values):
+        if in_gym and values.get("trainingType") != "fitness":
+            raise ValueError("inGym can only be True if trainingType is 'fitness'")
+        return in_gym
+
+    @validator("inSwimmingPool")
+    def validate_in_swimming_pool(cls, in_swimming_pool, values):
+        if in_swimming_pool and values.get("trainingType") != "swimming":
+            raise ValueError(
+                "inSwimmingPool can only be True if trainingType is 'swimming'"
+            )
+        return in_swimming_pool
 
 
 class Report(BaseModel):
@@ -63,32 +90,59 @@ def load_messages(message_path: str, logger: Logger) -> Dict[str, Any]:
 
 
 @typechecked
-def convert_json_personal_training_to_human_readable(data: Dict[str, Any]) -> str:
-    output = []
-    # Извлекаем общие данные
-    in_gym: bool = data["inGym"]
-    year: int = int(data["Year"])
-    week: int = int(data["Week"])
-    day: int = int(data["Day"])
+def convert_json_to_human_readable(resources: List[Dict[str, Any]]) -> str:
+    week_output: List[str] = []
+    if not resources:
+        raise ValueError("Нет тренировок для форматирования")
+    for data in resources:
+        common_info: CommonTrainingInfo = CommonTrainingInfo(**data)
+        day_output: List[str] = []
+        # Форматируем заголовок
+        title: str = format_title(common_info)
+        day_output.append(title)
+        day_output.append("Твои упражнения на сегодня:\n")
 
-    # Форматируем заголовок
-    title: str = (
-        f"День {day} КД {week} Год {year} - еще одна тренировочка, солнышко!!! 🌞\n"
+        converted: str
+        if common_info.trainingType == "fitness":
+            converted = convert_fitness_exercises(data["Exercises"])
+        elif common_info.trainingType == "swimming":
+            converted = convert_swimming_exercises(data["Exercises"])
+        else:
+            raise ValueError(
+                "This training type is not supported! Supported: ['fitness', 'swimming']"
+            )
+
+        day_output.append(converted)
+
+        # Извлекаем итоговые статистики
+        total_exercises = int(data["TotalNumberExercises"])
+        total_day_time = int(data["TotalTime"] / 60)  # Конвертируем секунды в минуты
+        day_output.append(
+            f"\n🔥 Всего упражнений сегодня: {total_exercises} - ты молодец!"
+        )
+        if total_day_time != 0:
+            day_output.append(
+                f"⏱ Общее время тренировки: примерно {total_day_time} мин - замечательно! \n"
+            )
+        total_day_volume: int = int(data["TotalVolume"])
+        if total_day_volume != 0:
+            day_output.append(
+                f"⏱Объем тренировки: {total_day_volume} {data['TotalVolumeUnits']} - круто! \n"
+            )
+        week_output.append("\n".join(day_output))
+        week_output.append("\n" + separator())
+
+    total_trainings_week: str = (
+        f" 🔥 На неделе {common_info.Week} всего {len(resources)} трен."
     )
-    output.append(title)
+    week_output.append(total_trainings_week)
+    return "\n".join(week_output)
 
-    # Форматируем зал или улица
-    gym_or_outdoor: str = (
-        "🏋️‍♀️ Ой, как здорово! Сегодня тренировочка в тренажерном зале! 💪\n"
-        if in_gym
-        else "🌳 Ура! Сегодня тренируемся на свежем воздухе! 🍃\n"
-    )
-    output.append(gym_or_outdoor)
 
-    output.append("Твои упражнения на сегодня:\n")
-
-    # Извлекаем и форматируем каждое упражнение
-    for index, exercise in enumerate(data["Exercises"], 1):
+@typechecked
+def convert_fitness_exercises(exercises: List[Dict[str, Any]]) -> str:
+    converted: List[str] = []
+    for index, exercise in enumerate(exercises, 1):
         name = exercise["Name"]
         n_sets = int(exercise["nSets"])
         n_reps = int(exercise["nReps"])
@@ -107,18 +161,135 @@ def convert_json_personal_training_to_human_readable(data: Dict[str, Any]) -> st
             )
 
         if comments:
-            exercise_info += f"\n    💬 Комментарии: {comments}\n"
+            exercise_info += f"\n💬 Комментарии: {comments}\n"
 
-        output.append(exercise_info)
+        converted.append(exercise_info)
+    return "\n".join(converted)
 
-    # Извлекаем итоговые статистики
-    total_exercises = int(data["TotalNumberExercises"])
-    total_time = int(data["TotalTime"] / 60)  # Конвертируем секунды в минуты
-    output.append(f"\n🔥 Всего упражнений сегодня: {total_exercises} - ты молодец!")
-    output.append(
-        f"⏱ Общее время тренировки: примерно {total_time} минут - замечательно!"
+
+@typechecked
+def convert_swimming_exercises(exercises: List[Dict[str, Any]]) -> str:
+    max_speed: int = 6
+    converted: List[str] = []
+
+    # iterate over each exercise
+    for i, exercise in enumerate(exercises, start=1):
+        volume = exercise["Volume"]
+        time = exercise["Time"]
+        volume_units = exercise["VolumeUnits"]
+        time_units = exercise["TimeUnits"]
+        stroke = exercise["Stroke"]
+        speed = exercise["Speed"]
+        comments = exercise["Comments"].capitalize()
+
+        # use Volume if it's not None, otherwise use Time
+        volume_or_time = (
+            f"{volume:.0f}{adjust_units(volume_units)}"
+            if is_volume_provided(volume)
+            else f"{time:.0f}{adjust_units(time_units)}"
+        )
+
+        coordination: CoordinationType = handle_coordination(exercise)
+        equipment: str = handle_equipment(exercise)
+
+        exercise_info = (
+            f"{i}. {volume_or_time} {stroke} "
+            f"{coordination}, {equipment}"
+            f" скорость {speed}/{max_speed}"
+        )
+        if comments:
+            exercise_info += f"\n💬 Комментарии: {comments}\n"
+
+        converted.append(exercise_info)
+    converted.append(swim_ending())
+    return "\n".join(converted)
+
+
+@typechecked
+def handle_coordination(exercise: Dict[str, Any]) -> CoordinationType:
+    if exercise["Arms"] and exercise["Legs"]:
+        return "в/к"
+    elif not exercise["Arms"] and not exercise["Legs"]:
+        return "упр."
+    elif exercise["Arms"] and not exercise["Legs"]:
+        return "н/р"
+    else:
+        return "н/н"
+
+
+@typechecked
+def handle_equipment(exercise: Dict[str, Any]) -> str:
+    equipment: str = ""
+    ###MAIN EQUIPMENT####
+    if exercise["Equipment"]["KickBoard"]:
+        equipment: str = equipment + "с доской"
+    elif exercise["Equipment"]["PullBuoy"]:
+        equipment: str = equipment + "с колобашкой"
+
+    ###ADDITIONAL EQUIPMENT####
+    if exercise["Equipment"]["Paddles"]:
+        equipment: str = equipment + "с лопатками"
+    if exercise["Equipment"]["Snorkel"]:
+        equipment: str = equipment + "с трубкой"
+
+    return equipment
+
+
+@typechecked
+def handle_total_duration(total_week_time: int) -> str:
+    if total_week_time == 0.0:
+        return ""
+    total_duration: str = (
+        f"⏱ Общая продолжительность (+/-): {total_week_time // 60} ч "
+        f"{round((total_week_time / 60) * 60 - (total_week_time // 60) * 60)} мин "
     )
-    return "\n".join(output)
+    return total_duration
+
+
+@typechecked
+def is_volume_provided(volume: float) -> bool:
+    return (volume is not None) and (volume != 0)
+
+
+@typechecked
+def adjust_units(unit: str) -> str:
+    units: Dict[str, str] = {"m": "м", "min": "мин"}
+    return units.get(unit, unit)
+
+
+@typechecked
+def format_title(common_info: CommonTrainingInfo, separator: str = "") -> str:
+    title: str
+    if common_info.trainingType == "swimming" and common_info.inSwimmingPool:
+        title = (
+            f"🏊‍ День {common_info.Day}, Неделя {common_info.Week} (в бассейне) 🏊‍️\n"
+        )
+    elif common_info.trainingType == "swimming" and not common_info.inSwimmingPool:
+        title = f"🌊 День {common_info.Day}, Неделя {common_info.Week} (на открытой воде) 🌊\n"
+    elif common_info.trainingType == "fitness" and common_info.inGym:
+        title = f"🏋️ День {common_info.Day}, Неделя {common_info.Week} (в тренажерном зале) 🏋️\n"
+
+    elif common_info.trainingType == "fitness" and not common_info.inGym:
+        title = f"🏡 День {common_info.Day}, Неделя {common_info.Week} (дома или на улице) 🏡\n"
+
+    else:
+        raise NotImplementedError
+
+    return title + separator
+
+
+@typechecked
+def separator(
+    n_seps: int = 20, sep: str = "-", n_endl: int = 1, endl: str = "\n"
+) -> str:
+    return sep * n_seps + n_endl * endl
+
+
+@typechecked
+def swim_ending(
+    n_waves: int = 3, wave: str = "🌊", n_endl: int = 0, endl: str = "\n"
+) -> str:
+    return n_waves * wave + n_endl * endl
 
 
 @typechecked

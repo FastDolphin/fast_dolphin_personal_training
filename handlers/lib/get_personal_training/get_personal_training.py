@@ -8,7 +8,7 @@ from telegram.ext import (
 import requests
 from utils import (
     Config,
-    convert_json_personal_training_to_human_readable,
+    convert_json_to_human_readable,
     fetch_calender_week,
     fetch_current_year,
 )
@@ -61,7 +61,6 @@ def send_personal_training_handler_factory(
                 headers=headers,
                 timeout=10,
             )
-
             logger.debug(
                 f"Received HTTP {get_response.status_code} from backend for training plan request."
             )
@@ -93,17 +92,16 @@ def send_personal_training_handler_factory(
                         )
                         put_response.raise_for_status()
                         logger.info("Updated tg_id for training plan")
-                    for resource in resources:
-                        if isinstance(resource, dict):
-                            formatted_resource = (
-                                convert_json_personal_training_to_human_readable(
-                                    resource
-                                )
-                            )
-                            formatted_list.append(formatted_resource)
-                        else:
-                            formatted_list.append(str(resource))
-                    formatted_data = "\n".join(formatted_list)
+                    formatted_data = convert_json_to_human_readable(resources)
+                    # for resource in resources:
+                    #     if isinstance(resource, dict):
+                    #         formatted_resource = convert_json_to_human_readable(
+                    #             resource
+                    #         )
+                    #         formatted_list.append(formatted_resource)
+                    #     else:
+                    #         formatted_list.append(str(resource))
+                    # formatted_data = "\n".join(formatted_list)
             else:
                 formatted_data = str(data)
 
