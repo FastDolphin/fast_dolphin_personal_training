@@ -81,8 +81,10 @@ def send_personal_training_handler_factory(
                         f"No training plans found for user {user_chat_id} for given criteria."
                     )
                 else:
-                    formatted_list = []
-                    if resources[0]["TgId"] == 0:
+                    week_tg_ids: List[int] = [
+                        resource["TgId"] for resource in resources
+                    ]
+                    if any(tg_id == 0 for tg_id in week_tg_ids):
                         put_params = get_params
                         put_response: Response = requests.put(
                             f"{cfg.BACKEND_API}/{cfg.VERSION}/{cfg.UPDATE_PERSONAL_TRAINING_TG_ID}",
@@ -93,15 +95,6 @@ def send_personal_training_handler_factory(
                         put_response.raise_for_status()
                         logger.info("Updated tg_id for training plan")
                     formatted_data = convert_json_to_human_readable(resources)
-                    # for resource in resources:
-                    #     if isinstance(resource, dict):
-                    #         formatted_resource = convert_json_to_human_readable(
-                    #             resource
-                    #         )
-                    #         formatted_list.append(formatted_resource)
-                    #     else:
-                    #         formatted_list.append(str(resource))
-                    # formatted_data = "\n".join(formatted_list)
             else:
                 formatted_data = str(data)
 
