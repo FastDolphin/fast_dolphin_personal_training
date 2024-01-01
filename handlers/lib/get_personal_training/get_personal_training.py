@@ -38,7 +38,7 @@ def send_personal_training_handler_factory(
         current_calender_week: int = fetch_calender_week()
         get_params: Dict[str, int] = {
             "tg_id": user_chat_id,
-            "year": 2023,
+            "year": current_year,
             "week": current_calender_week,
         }
         headers: Dict[str, str] = {
