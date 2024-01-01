@@ -86,7 +86,7 @@ def authorize_handler_factory(cfg: Config, logger: Logger, messages: Dict[str, A
                                 os.environ["X-API-Key"] = context.user_data["api_token"]
                                 context.bot.send_message(
                                     chat_id=update.effective_chat.id,
-                                    text="Отлично! Солнышко, я тебя узнал! Ты моя умничка, давай начнем тренировки!!!",
+                                    text=messages["i_know_you"],
                                 )
 
                                 put_params: Dict[str, Any] = {
@@ -110,7 +110,7 @@ def authorize_handler_factory(cfg: Config, logger: Logger, messages: Dict[str, A
                             else:
                                 context.bot.send_message(
                                     chat_id=update.effective_chat.id,
-                                    text="Ой! А доступ уже закончился! Нужно запросить новый!",
+                                    text=messages["access_expired"],
                                 )
                                 send_menu_handler = send_menu_handler_factory(cfg)
                                 send_menu_handler(update, context)
